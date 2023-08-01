@@ -1,33 +1,45 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
+	"github.com/sirupsen/logrus"
 	"github.com/walterchris/smarthome-application-manager-sam/pkg/config"
 	"github.com/walterchris/smarthome-application-manager-sam/pkg/loader"
 	_ "github.com/walterchris/smarthome-application-manager-sam/plugins/caldev"
 	_ "github.com/walterchris/smarthome-application-manager-sam/plugins/examplePlugin"
 )
 
+var log = logrus.New()
+
+func init() {
+	log.SetFormatter(&logrus.TextFormatter{
+		ForceColors: true,
+	})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(logrus.TraceLevel)
+}
+
 func main() {
-	fmt.Println("Started Main.")
+	log.Tracef("Starting main")
 
 	// Load Configuration
 	config, err := config.Parse("./config.yaml")
 	if err != nil {
-		panic(err.Error())
+		log.Errorf("Unable to parse config file: %v", err)
+		log.Errorf("Continuing with empty config resulting in loading no plugins")
 	}
 
 	if config != nil {
-		fmt.Printf("%+v\n", config)
+		log.Tracef("%+v\n", config)
 	}
 
 	// Load Plugin
 	for _, loadfunc := range loader.LoadFunctions {
 		if loadfunc != nil {
-			p, err := loadfunc()
+			p, err := loadfunc(log)
 			if err != nil || p == nil {
-				panic(err.Error())
+				log.Errorf("Excuting loading function failed with '%v' or was nil", err)
 			}
 
 			// Check if Plugin is in Config - if not, don't run it.
@@ -35,6 +47,7 @@ func main() {
 			for _, plugin := range config.Plugins {
 				found = false
 				if plugin[p.Name()] != nil {
+					log.Debugf("Found config for plugin '%s'", p.Name())
 					found = true
 					break
 				}
@@ -46,7 +59,7 @@ func main() {
 			// Run the Plugins
 			err = p.Run()
 			if err != nil {
-				panic(err.Error())
+				log.Errorf("Running '%s's Run() function failed: %v", p.Name(), err)
 			}
 		}
 	}

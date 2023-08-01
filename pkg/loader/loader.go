@@ -1,5 +1,8 @@
 package loader
 
-import "github.com/walterchris/smarthome-application-manager-sam/plugins"
+import (
+	"github.com/sirupsen/logrus"
+	"github.com/walterchris/smarthome-application-manager-sam/plugins"
+)
 
-var LoadFunctions []func() (plugins.Plugin, error)
+var LoadFunctions []func(*logrus.Logger) (plugins.Plugin, error)
