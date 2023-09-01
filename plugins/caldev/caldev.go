@@ -2,6 +2,7 @@ package caldev
 
 import (
 	"github.com/sirupsen/logrus"
+	"github.com/walterchris/smarthome-application-manager-sam/pkg/communication"
 	"github.com/walterchris/smarthome-application-manager-sam/pkg/loader"
 	"github.com/walterchris/smarthome-application-manager-sam/plugins"
 )
@@ -16,7 +17,7 @@ func init() {
 	loader.LoadFunctions = append(loader.LoadFunctions, Load)
 }
 
-func Load(logger *logrus.Logger) (plugins.Plugin, error) {
+func Load(logger *logrus.Logger, channels communication.Channels) (plugins.Plugin, error) {
 	log = logger
 	log.Tracef("%s:\tLoad\n", name)
 
