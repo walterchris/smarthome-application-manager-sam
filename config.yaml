@@ -1,0 +1,6 @@
+name: "SAM - The Smarthome Application Manager"
+plugins:
+  - ExamplePlugin:
+      optionA: "Hello"
+  - CalDev-Plugin:
+      optionB: "World"

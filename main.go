@@ -8,6 +8,7 @@ import (
 	"github.com/walterchris/smarthome-application-manager-sam/pkg/loader"
 	_ "github.com/walterchris/smarthome-application-manager-sam/plugins/caldev"
 	_ "github.com/walterchris/smarthome-application-manager-sam/plugins/examplePlugin"
+	"github.com/walterchris/smarthome-application-manager-sam/plugins/mqtt"
 )
 
 var log = logrus.New()
@@ -34,10 +35,17 @@ func main() {
 		log.Tracef("%+v\n", config)
 	}
 
+	// Load MQTT Communication
+	mqtt, err := mqtt.New()
+	if err != nil {
+		log.Errorf("mqtt.New() = '%v'", err)
+		return
+	}
+
 	// Load Plugin
 	for _, loadfunc := range loader.LoadFunctions {
 		if loadfunc != nil {
-			p, err := loadfunc(log)
+			p, err := loadfunc(log, mqtt.Channels)
 			if err != nil || p == nil {
 				log.Errorf("Excuting loading function failed with '%v' or was nil", err)
 			}
@@ -63,4 +71,7 @@ func main() {
 			}
 		}
 	}
+
+	// Run MQTT
+	mqtt.Run()
 }
