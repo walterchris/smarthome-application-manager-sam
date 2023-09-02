@@ -1,9 +1,10 @@
 package communication
 
 type Channels struct {
-	messages chan mqtt
+	Messages chan Mqtt
 }
 
-type mqtt struct {
-	payload string
+type Mqtt struct {
+	Topic string
+	Msg   string
 }
