@@ -4,3 +4,5 @@ plugins:
       optionA: "Hello"
   - CalDev-Plugin:
       optionB: "World"
+  - Deye600:
+      nooption: true

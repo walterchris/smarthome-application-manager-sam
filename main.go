@@ -2,11 +2,14 @@ package main
 
 import (
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/sirupsen/logrus"
 	"github.com/walterchris/smarthome-application-manager-sam/pkg/config"
 	"github.com/walterchris/smarthome-application-manager-sam/pkg/loader"
 	_ "github.com/walterchris/smarthome-application-manager-sam/plugins/caldev"
+	_ "github.com/walterchris/smarthome-application-manager-sam/plugins/deye600"
 	_ "github.com/walterchris/smarthome-application-manager-sam/plugins/examplePlugin"
 	"github.com/walterchris/smarthome-application-manager-sam/plugins/mqtt"
 )
@@ -24,6 +27,15 @@ func init() {
 func main() {
 	log.Tracef("Starting main")
 
+	// Create signals channel to run server until interrupted
+	sigs := make(chan os.Signal, 1)
+	done := make(chan bool, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigs
+		done <- true
+	}()
+
 	// Load Configuration
 	config, err := config.Parse("./config.yaml")
 	if err != nil {
@@ -36,7 +48,7 @@ func main() {
 	}
 
 	// Load MQTT Communication
-	mqtt, err := mqtt.New()
+	mqtt, err := mqtt.New(log)
 	if err != nil {
 		log.Errorf("mqtt.New() = '%v'", err)
 		return
@@ -65,13 +77,12 @@ func main() {
 			}
 
 			// Run the Plugins
-			err = p.Run()
-			if err != nil {
-				log.Errorf("Running '%s's Run() function failed: %v", p.Name(), err)
-			}
+			go p.Run()
 		}
 	}
 
 	// Run MQTT
-	mqtt.Run()
+	go mqtt.Run()
+
+	<-done
 }
