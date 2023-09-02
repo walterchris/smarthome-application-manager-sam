@@ -24,10 +24,8 @@ func Load(logger *logrus.Logger, channels communication.Channels) (plugins.Plugi
 	return Caldev{}, nil
 }
 
-func (cd Caldev) Run() error {
+func (cd Caldev) Run() {
 	log.Tracef("%s:\tRun\n", name)
-
-	return nil
 }
 
 func (cd Caldev) Name() string {

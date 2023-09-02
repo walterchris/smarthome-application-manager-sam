@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"os"
 	"regexp"
@@ -30,10 +29,6 @@ var values = map[string]string{
 	"webdata_total_e": "0",
 }
 
-type config struct {
-	IP net.IP
-}
-
 type Deye600 struct{}
 
 func init() {
@@ -49,7 +44,7 @@ func Load(logger *logrus.Logger, channels communication.Channels) (plugins.Plugi
 	return Deye600{}, nil
 }
 
-func (deye600 Deye600) Run() error {
+func (deye600 Deye600) Run() {
 	log.Tracef("%s:\tRun\n", name)
 
 	for {
@@ -91,8 +86,6 @@ func (deye600 Deye600) Run() error {
 		resp.Body.Close()
 		time.Sleep(5 * time.Second)
 	}
-
-	return nil
 }
 
 func (deye600 Deye600) Name() string {

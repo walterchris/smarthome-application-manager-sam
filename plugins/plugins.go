@@ -1,6 +1,6 @@
 package plugins
 
 type Plugin interface {
-	Run() error
+	Run()
 	Name() string
 }

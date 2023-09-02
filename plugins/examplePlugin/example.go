@@ -30,7 +30,7 @@ func Load(logger *logrus.Logger, channels communication.Channels) (plugins.Plugi
 	return Example{}, nil
 }
 
-func (ex Example) Run() error {
+func (ex Example) Run() {
 	log.Tracef("%s:\tRun\n", name)
 
 	for {
@@ -43,8 +43,6 @@ func (ex Example) Run() error {
 
 		time.Sleep(20 * time.Second)
 	}
-
-	return nil
 }
 
 func (ex Example) Name() string {
